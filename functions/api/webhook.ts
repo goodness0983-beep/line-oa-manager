@@ -65,6 +65,7 @@ export const onRequestPost: PagesFunction<{
 
         console.log("Signature verified successfully");
         const payload: WebhookRequest = JSON.parse(body);
+        console.log("Payload Events Count:", payload.events?.length || 0);
 
         if (!env.MESSAGES_KV) {
             console.error("Error: MESSAGES_KV namespace is not bound");
@@ -72,9 +73,11 @@ export const onRequestPost: PagesFunction<{
         }
 
         for (const event of payload.events) {
+            console.log(`Processing event type: ${event.type}`);
             if (event.type === "message" && event.message?.type === "text") {
                 const userId = event.source.userId;
-                const messageText = event.message.text;
+                const messageText = event.message.text || "";
+                console.log(`Received text message from ${userId}: ${messageText.substring(0, 50)}`);
 
                 // Save message to KV
                 // For simplicity, we'll store messages in a list per user
