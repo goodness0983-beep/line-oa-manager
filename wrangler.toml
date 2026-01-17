@@ -1,0 +1,12 @@
+
+name = "line-oa-manager"
+pages_build_output_dir = "dist"
+
+kv_namespaces = [
+  { binding = "MESSAGES_KV", id = "a2cca34b8c4143bbae84fc43d30e7550" }
+]
+
+[env.production]
+kv_namespaces = [
+  { binding = "MESSAGES_KV", id = "a2cca34b8c4143bbae84fc43d30e7550" }
+]
