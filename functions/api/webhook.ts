@@ -44,6 +44,14 @@ export const onRequestPost: PagesFunction<{
         }
 
         // LINE Signature Verification
+        let signatureBin: Uint8Array;
+        try {
+            signatureBin = Uint8Array.from(atob(signature), c => c.charCodeAt(0));
+        } catch (e) {
+            console.error("Error: Invalid base64 in signature header");
+            return new Response("Invalid signature format", { status: 400 });
+        }
+
         const encoder = new TextEncoder();
         const secretKeyData = encoder.encode(env.LINE_CHANNEL_SECRET);
         const key = await crypto.subtle.importKey(
@@ -55,7 +63,6 @@ export const onRequestPost: PagesFunction<{
         );
 
         const data = encoder.encode(body);
-        const signatureBin = Uint8Array.from(atob(signature), c => c.charCodeAt(0));
         const isValid = await crypto.subtle.verify("HMAC", key, signatureBin, data);
 
         if (!isValid) {
