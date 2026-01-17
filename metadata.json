@@ -1,0 +1,8 @@
+{
+  "name": "LINE Official Account Manager",
+  "description": "A high-end dashboard for managing LINE Official Account messages, featuring real-time chat simulation, AI-powered insights, and customer relationship management.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}
