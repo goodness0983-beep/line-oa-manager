@@ -29,8 +29,18 @@ export const onRequestPost: PagesFunction<{
         const body = await request.text();
         const signature = request.headers.get("x-line-signature");
 
+        console.log("--- Received Webhook Request ---");
+        console.log("Signature present:", !!signature);
+        console.log("Body length:", body.length);
+
         if (!signature) {
+            console.error("Error: Missing x-line-signature header");
             return new Response("Missing signature", { status: 401 });
+        }
+
+        if (!env.LINE_CHANNEL_SECRET) {
+            console.error("Error: LINE_CHANNEL_SECRET environment variable is missing");
+            return new Response("Secret missing", { status: 500 });
         }
 
         // LINE Signature Verification
@@ -49,10 +59,17 @@ export const onRequestPost: PagesFunction<{
         const isValid = await crypto.subtle.verify("HMAC", key, signatureBin, data);
 
         if (!isValid) {
+            console.error("Error: LINE signature verification failed");
             return new Response("Invalid signature", { status: 401 });
         }
 
+        console.log("Signature verified successfully");
         const payload: WebhookRequest = JSON.parse(body);
+
+        if (!env.MESSAGES_KV) {
+            console.error("Error: MESSAGES_KV namespace is not bound");
+            return new Response("KV not bound", { status: 500 });
+        }
 
         for (const event of payload.events) {
             if (event.type === "message" && event.message?.type === "text") {
